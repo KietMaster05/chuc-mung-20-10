@@ -311,11 +311,11 @@
                 </div>
             </section>
 
-            <!-- RANDOM 3 GIFTS BOX SECTION -->
+            <!-- RANDOM GIFTS BOX SECTION -->
             <section class="space-y-6 text-center max-w-xl mx-auto">
                 <div class="space-y-2">
                     <h2 class="font-serif text-2xl md:text-3xl font-bold text-accentGold">Hộp Quà May Mắn 20/10</h2>
-                    <p class="text-xs md:text-sm text-slate-300">Nhấn vào hộp quà bên dưới để hệ thống bốc thăm phần quà dành riêng cho <span class="userNameDisplay">bạn</span>! (Đồng bộ trực tiếp lên Google Sheets)</p>
+                    <p class="text-xs md:text-sm text-slate-300">Nhấn vào hộp quà bên dưới để hệ thống bốc thăm phần quà (5k, 10k, 15k, 100k) dành riêng cho <span class="userNameDisplay">bạn</span>!</p>
                 </div>
 
                 <div class="glass-card rounded-3xl p-8 flex flex-col items-center text-center space-y-6 border border-emerald-500/30 glow-gold">
@@ -446,7 +446,7 @@
     <script>
         const CORRECT_PASSWORD = "0510"; 
         
-        // ⚠️ Đường dẫn Web App URL của Google Apps Script đã được cấu hình sẵn:
+        // Đường dẫn Web App URL của Google Apps Script:
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxI6Qq_4mYt9YZe0N0BGcdL8NEgpAsd6YSp-64m2LB5d9fXhbN6e-HNMZYSejNFFsI4/exec";
 
         let currentUserName = "bạn";
@@ -586,7 +586,6 @@
             }
         }
 
-        // Tự động gửi và gọi lại hàm fetchSheetData để reload dữ liệu ngay lập tức
         async function sendDataToSheet(payload) {
             if (GOOGLE_SCRIPT_URL.includes("DÁN_WEB_APP_URL")) return;
             try {
@@ -597,7 +596,6 @@
                     body: JSON.stringify(payload)
                 });
                 
-                // Tự động tải lại dữ liệu mới từ Google Sheets sau 1.2 giây để cập nhật bảng
                 setTimeout(fetchSheetData, 1200);
             } catch (e) {
                 console.log("Lỗi gửi dữ liệu lên Google Sheets:", e);
@@ -675,7 +673,7 @@
             }
         }
 
-        // Random Gift Box Handler with Google Sheets Sync
+        // Random Gift Box Handler with Google Sheets Sync (Included 100k)
         function openRandomGift() {
             const userRecord = globalSheetData.find(r => r.name.toLowerCase() === currentUserName.toLowerCase());
             let selectedGift = userRecord ? userRecord.gift : "";
@@ -692,13 +690,18 @@
                     emoji = "🧋";
                     title = `Phần Quà Đã Lưu của ${currentUserName}`;
                     message = `🎁 Bạn đã mở quà trước đó: Voucher hỗ trợ nửa ly trà sữa trị giá 10.000đ nhân ngày Phụ nữ Việt Nam!`;
-                } else {
+                } else if (selectedGift === "15k") {
                     emoji = "🧧";
                     title = `Phần Quà Đã Lưu của ${currentUserName}`;
                     message = `✨ Bạn đã mở quà trước đó: Bao lì xì tài lộc trị giá 15.000đ cùng ngập tràn lời chúc hạnh phúc!`;
+                } else {
+                    emoji = "💎";
+                    title = `Phần Quà Siêu Khủng của ${currentUserName}`;
+                    message = `🏆 Tuyệt đỉnh may mắn! Bạn đã trúng phần quà đặc biệt trị giá 100.000đ! Chúc mừng ${currentUserName}!`;
                 }
             } else {
-                const options = ["5k", "10k", "15k"];
+                // Thêm tỉ lệ phần thưởng (ví dụ: 100k có thể xuất hiện trong danh sách)
+                const options = ["5k", "10k", "15k", "5k", "10k", "100k"];
                 selectedGift = options[Math.floor(Math.random() * options.length)];
                 
                 sendDataToSheet({ name: currentUserName, gift: selectedGift });
@@ -713,10 +716,16 @@
                     emoji = "🧋";
                     title = `Chúc Mừng ${currentUserName}!`;
                     message = `🎁 Quá may mắn! ${currentUserName} bốc trúng voucher hỗ trợ nửa ly trà sữa trị giá 10.000đ nhân ngày Phụ nữ Việt Nam!`;
-                } else {
+                } else if (selectedGift === "15k") {
                     emoji = "🧧";
                     title = `Chúc Mừng ${currentUserName}!`;
                     message = `✨ Đỉnh cao vận may! ${currentUserName} đã rút trúng bao lì xì tài lộc trị giá 15.000đ cùng ngập tràn lời chúc hạnh phúc!`;
+                } else {
+                    emoji = "💎";
+                    title = `CHÚC MỪNG ${currentUserName.toUpperCase()}!`;
+                    message = `🌟 WOOOW! Quá xuất sắc! ${currentUserName} đã bốc trúng phần quà SIÊU KHỦNG trị giá 100.000đ nhân dịp 20/10! 🎉`;
+                    triggerFireworks();
+                    setTimeout(triggerFireworks, 500);
                 }
                 triggerFireworks();
             }
